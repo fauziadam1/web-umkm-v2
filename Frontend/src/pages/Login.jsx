@@ -2,13 +2,12 @@ import { z } from "zod";
 import { setUser } from "@/lib/auth";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { HandCoins } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { PasswordSchema } from "@/lib/password-schema";
 import {
   Field,
   FieldError,
@@ -20,6 +19,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { PasswordInput } from "@/components/ui/password-input";
 
 export function LoginPage() {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
   const formSchema = z.object({
@@ -38,8 +38,9 @@ export function LoginPage() {
   const onSubmit = async () => {
     setLoading(true);
     try {
-      const res = await api.post("/api/login");
+      const res = await api.post("/api/login", form.watch());
       setUser(res.data.data);
+      navigate("/");
       setLoading(false);
     } catch (errors) {
       toast.error(errors.response.data.message);

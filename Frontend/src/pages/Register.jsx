@@ -2,7 +2,7 @@ import { z } from "zod";
 import { setUser } from "@/lib/auth";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { HandCoins } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -20,20 +20,22 @@ import { Spinner } from "@/components/ui/spinner";
 
 export function RegisterPage() {
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const formSchema = z.object({
-    name: z.string().trim().min(1, "The name field is required"),
-    email: z.string().trim().min(1, "The email field is required"),
-    password: PasswordSchema,
-    password_confirmation: z
-      .string()
-      .trim()
-      .min(1, "The confirm field is required"),
-  });
-  z.refine((values) => values.password === values.password_confirmation, {
-    message: "The confirm password does not match",
-    path: ["password_confirmation"],
-  });
+  const formSchema = z
+    .object({
+      name: z.string().trim().min(1, "The name field is required"),
+      email: z.string().trim().min(1, "The email field is required"),
+      password: PasswordSchema,
+      password_confirmation: z
+        .string()
+        .trim()
+        .min(1, "The confirm field is required"),
+    })
+    .refine((values) => values.password === values.password_confirmation, {
+      message: "The confirm password does not match",
+      path: ["password_confirmation"],
+    });
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -48,8 +50,9 @@ export function RegisterPage() {
   const onSubmit = async () => {
     setLoading(true);
     try {
-      const res = await api.post("/api/register");
+      const res = await api.post("/api/register", form.watch());
       setUser(res.data.data);
+      navigate("/");
       setLoading(false);
     } catch (errors) {
       toast.error(errors.response.data.message);

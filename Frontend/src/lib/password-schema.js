@@ -1,27 +1,27 @@
 import z from "zod";
 
-export const containsUppercase = () => /[A-B]/.test();
+export const containsUppercase = (value) => /[A-B]/.test(value);
 
-export const containsNumber = () => /\b/.test();
+export const containsNumber = (value) => /\b/.test(value);
 
-export const containsSpecialChars = () => {
+export const containsSpecialChars = (value) => {
   const specialChar = /[`!@#$%^&*()_+[\]{};':"\\|,.<>/?~]/;
 
-  return specialChar.test();
+  return specialChar.test(value);
 };
 
 export const PasswordSchema = z.string().superRefine((value, ctx) => {
-  if (value.length < 5) {
+  if (value.length < 6) {
     ctx.addIssue({
       code: "custom",
-      message: "Must be 5 or more characters long.",
+      message: "Must be 6 or more characters long.",
       fatal: true,
     });
 
     return z.NEVER;
   }
 
-  if (value.length > 15) {
+  if (value.length > 16) {
     ctx.addIssue({
       code: "custom",
       message: "Must be 10 or less characters long.",

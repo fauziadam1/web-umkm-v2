@@ -4,12 +4,15 @@ import "./index.css";
 import App from "./App.jsx";
 import { BrowserRouter } from "react-router";
 import { Toaster } from "sonner";
+import { ThemeProvider } from "next-themes";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <BrowserRouter>
-      <App />
-      <Toaster/>
-    </BrowserRouter>
+    <ThemeProvider attribute="class">
+      <BrowserRouter>
+        <App />
+        <Toaster />
+      </BrowserRouter>
+    </ThemeProvider>
   </StrictMode>,
 );

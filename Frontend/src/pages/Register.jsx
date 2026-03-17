@@ -59,7 +59,7 @@ export function RegisterPage() {
 
   return (
     <div className="w-full h-screen flex items-center justify-center">
-      <div className="space-y-10">
+      <div className="space-y-7">
         <div className="flex flex-col items-center gap-3">
           <Link to={"/"}>
             <div className="w-10 h-10">
@@ -158,6 +158,15 @@ export function RegisterPage() {
             </Field>
           </form>
         </FieldGroup>
+        <div className="text-center text-sm text-muted-foreground">
+          Already have an account?{" "}
+          <Link
+            to={"/login"}
+            className="underline decoration-gray-400 underline-offset-3 font-medium duration-200 hover:underline hover:decoration-foreground text-foreground"
+          >
+            Sign In
+          </Link>
+        </div>
       </div>
     </div>
   );

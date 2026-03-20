@@ -1,11 +1,11 @@
 import { HandCoins } from "lucide-react";
 import { Link } from "react-router";
 import { Button } from "./ui/button";
-import { getUser } from "@/lib/auth";
+import { useAuth } from "@/lib/auth";
 import { AvaterUser } from "./AvatarUser";
 
 export function Layout() {
-  const user = getUser();
+  const { user } = useAuth();
 
   return (
     <div className="fixed w-full flex items-center justify-between border-b bg-white px-5 py-3">

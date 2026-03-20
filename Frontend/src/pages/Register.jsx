@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { setUser } from "@/lib/auth";
+import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { Link, useNavigate } from "react-router";
@@ -21,6 +21,7 @@ import { Spinner } from "@/components/ui/spinner";
 export function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const formSchema = z
     .object({
@@ -51,7 +52,10 @@ export function RegisterPage() {
     setLoading(true);
     try {
       const res = await api.post("/api/register", form.watch());
-      setUser(res.data.data);
+      login({
+        ...res.data.data,
+        token: res.data.token,
+      });
       navigate("/");
       setLoading(false);
     } catch (errors) {

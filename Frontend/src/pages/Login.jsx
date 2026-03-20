@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { setUser } from "@/lib/auth";
+import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { Link, useNavigate } from "react-router";
@@ -20,6 +20,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 
 export function LoginPage() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const formSchema = z.object({
@@ -39,7 +40,10 @@ export function LoginPage() {
     setLoading(true);
     try {
       const res = await api.post("/api/login", form.watch());
-      setUser(res.data.data);
+      login({
+        ...res.data.data,
+        token: res.data.token,
+      });
       navigate("/");
       setLoading(false);
     } catch (errors) {

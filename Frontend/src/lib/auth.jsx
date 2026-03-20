@@ -1,12 +1,34 @@
-export const getUser = () => {
-  const user = localStorage.getItem("user");
-  return user ? JSON.parse(user) : null;
-};
+import { createContext, useContext, useMemo, useState } from "react";
 
-export const setUser = (data) => {
-  localStorage.setItem("user", JSON.stringify(data));
-};
+const AuthContext = createContext();
 
-export const logout = () => {
-  localStorage.removeItem("user");
-};
+export default function AuthProvider({ children }) {
+  const [user, setUser] = useState(
+    () => JSON.parse(localStorage.getItem("user")) || null,
+  );
+
+  const login = (data) => {
+    localStorage.setItem("user", JSON.stringify(data));
+    localStorage.setItem("token", data.token);
+    setUser(data);
+  };
+
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem("user");
+  };
+
+  const values = useMemo(
+    () => ({
+      user,
+      login,
+      logout,
+    }),
+    [user],
+  );
+
+  return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;
+}
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const useAuth = () => useContext(AuthContext);

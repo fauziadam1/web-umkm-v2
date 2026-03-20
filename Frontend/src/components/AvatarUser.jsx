@@ -1,7 +1,6 @@
-import { getUser } from "@/lib/auth";
+import { useAuth } from "@/lib/auth";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Button } from "./ui/button";
-import { logout } from "@/lib/auth";
 import { LogOutIcon, User2Icon } from "lucide-react";
 import {
   DropdownMenu,
@@ -9,9 +8,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { Link } from "react-router";
 
 export function AvaterUser() {
-  const user = getUser();
+  const { user } = useAuth();
+  const { logout } = useAuth();
 
   const handlelogout = async () => {
     logout();
@@ -30,9 +31,11 @@ export function AvaterUser() {
           </Avatar>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="-translate-x-5">
-          <DropdownMenuItem>
-            <User2Icon />
-            Profile
+          <DropdownMenuItem asChild>
+            <Link to={"/profile"}>
+              <User2Icon />
+              Profile
+            </Link>
           </DropdownMenuItem>
           <DropdownMenuItem
             variant="destructive"

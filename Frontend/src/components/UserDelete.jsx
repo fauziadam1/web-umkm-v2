@@ -19,8 +19,10 @@ import { Field, FieldError } from "./ui/field";
 import { useNavigate } from "react-router";
 import { useState } from "react";
 import { Spinner } from "./ui/spinner";
+import { useAuth } from "@/lib/auth";
 
 export function UserDelete() {
+  const { logout } = useAuth();
   const navigate = useNavigate();
   const [delLoading, setDelLoading] = useState(false);
 
@@ -39,11 +41,10 @@ export function UserDelete() {
     setDelLoading(true);
     try {
       await api.delete("/api/user", {
-        data: {
-          password: form.getValues("password"),
-        },
+        data: form.getValues(),
       });
       setDelLoading(false);
+      logout();
       navigate("/");
     } catch (errors) {
       toast.error(errors.response.data.message);
@@ -84,7 +85,7 @@ export function UserDelete() {
                     aria-invalid={fieldState.invalid}
                     placeholder="Password"
                     autoComplete="off"
-                  />
+                  />  
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}

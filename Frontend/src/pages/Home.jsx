@@ -4,8 +4,11 @@ import { ArrowRight, ShieldCheck } from "lucide-react";
 import { items } from "@/components/ItemSuggest";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router";
+import { useAuth } from "@/lib/auth";
 
 export default function HomePage() {
+  const { user } = useAuth();
+
   return (
     <div className="w-full h-screen bg-white">
       <Layout />
@@ -25,11 +28,17 @@ export default function HomePage() {
               Dapatkan pinjaman hingga Rp 5 Miliar untuk mengembangkan usaha
               Anda.
             </p>
-            <Link to={"/loan"}>
-              <Button>
-                Ajukan Sekarang <ArrowRight />
-              </Button>
-            </Link>
+            {user?.role === "admin" || user?.role === "manager" ? (
+              <Link to={"/"}>
+                <Button>Dashboard</Button>
+              </Link>
+            ) : (
+              <Link to={"/loan"}>
+                <Button>
+                  Ajukan Sekarang <ArrowRight />
+                </Button>
+              </Link>
+            )}
           </span>
           <div className="grid grid-cols-3 md:gap-13">
             {items.map((i) => (
@@ -40,7 +49,9 @@ export default function HomePage() {
                   </span>
                 </div>
                 <span className="space-y-1 text-center">
-                  <p className="text-[10.5px] md:text-sm text-gray-400">{i.title}</p>
+                  <p className="text-[10.5px] md:text-sm text-gray-400">
+                    {i.title}
+                  </p>
                   <h1 className="font-semibold text-sm md:text-[18px] dark:text-white">
                     {i.description}
                   </h1>

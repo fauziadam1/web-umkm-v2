@@ -23,13 +23,14 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
-            'password' => 'required|max:6|confirmed'
+            'password' => 'required|min:6|confirmed',
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password)
+            'password' => Hash::make($request->password),
+            'role' => 'user'
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -46,7 +47,8 @@ class UserController extends Controller
     {
         $request->validate([
             'email' => 'required|email',
-            'password' => 'required|string'
+            'password' => 'required|string',
+            'role' => 'user'
         ]);
 
         $user = User::where('email', $request->email)->first();
@@ -69,14 +71,14 @@ class UserController extends Controller
 
     public function update(Request $request)
     {
-        $user = $request->user()->id;
+        $user = $request->user();
 
         $request->validate([
             'name' => 'sometimes|required|string|max:255',
-            'email' => 'sometimes|required|email|unique:users',
+            'email' => 'sometimes|required|email',
         ]);
 
-        $user->update(['name', 'email']);
+        $user->update($request->only(['name', 'email']));
 
         return response()->json([
             'status' => 'Success',
@@ -103,7 +105,7 @@ class UserController extends Controller
             'password' => 'required|string'
         ]);
 
-        if (!$request->password !== $user->password) {
+        if (!Hash::check($request->password, $user->password)) {
             return response()->json([
                 'message' => 'Password incorrect'
             ], 403);

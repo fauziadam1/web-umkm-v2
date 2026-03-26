@@ -14,6 +14,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/user', [UserController::class, 'delete']);
 
     Route::post('/loan', [LoanController::class, 'store']);
+    Route::get('/loans', [LoanController::class, 'index']);
+    Route::get('/admin/loans', [LoanController::class, 'all']);
 });
 
 Route::post('/register', [UserController::class, 'register']);

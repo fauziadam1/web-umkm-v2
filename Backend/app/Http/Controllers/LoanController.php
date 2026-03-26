@@ -5,9 +5,28 @@ namespace App\Http\Controllers;
 use App\Models\Document;
 use App\Models\Loan;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class LoanController extends Controller
 {
+    public function index(Request $request)
+    {
+        $loan = Loan::where('user_id', $request->user()->id)->get();
+
+        return response()->json([
+            'data' => $loan
+        ]);
+    }
+
+    public function all()
+    {
+        $loan = Loan::all();
+
+        return response()->json([
+            'data' => $loan
+        ]);
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -18,16 +37,30 @@ class LoanController extends Controller
             'business_name' => 'required|string',
             'address' => 'required|string',
             'purpose' => 'required|string',
-            'amount' => 'required|string',
+            'amount' => 'required|integer',
             'tenor' => 'required|in:3 bulan,6 bulan,9 bulan,12 bulan,18 bulan,24 bulan',
-            'revenue' => 'required|in:Rp 300 Juta - 499 Juta per bulan,Rp 500 Juta - 1 Miliar per bulan,Rp 2 - 5 Miliar per bulan,> 5 Miliar per bulan',
 
             'ktp' => 'required|file|mimes:jpg,jpeg,png,pdf|max:10240',
             'npwp' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:10240',
             'business_photo.*' => 'nullable|file|mimes:jpg,jpeg,png|max:10240',
         ]);
 
+        $year = Carbon::now()->format('Y');
+
+        $lastLoan = Loan::whereYear('created_at', $year)->latest()->first();
+
+        if ($lastLoan) {
+            $lastNumber = (int) substr($lastLoan->loan_code, -4);
+            $newNumber = $lastNumber + 1;
+        } else {
+            $newNumber = 1;
+        }
+
+        $loanCode = 'LN-' . $year . '-' . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+
+
         $loan = Loan::create([
+            'loan_code' => $loanCode,
             'user_id' => $request->user()->id,
             'firstname' => $request->firstname,
             'lastname' => $request->lastname,
@@ -39,7 +72,6 @@ class LoanController extends Controller
             'purpose' => $request->purpose,
             'amount' => $request->amount,
             'tenor' => $request->tenor,
-            'revenue' => $request->revenue,
         ]);
 
         if ($request->hasFile('ktp')) {

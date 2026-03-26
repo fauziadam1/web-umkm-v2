@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('loans', function (Blueprint $table) {
             $table->id();
+            $table->string('loan_code')->unique();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('firstname', 255);
             $table->string('lastname', 255);
@@ -22,9 +23,8 @@ return new class extends Migration
             $table->string('business_name');
             $table->text('address');
             $table->text('purpose');
-            $table->string('amount');
+            $table->integer('amount');
             $table->enum('tenor', ['3 bulan', '6 bulan', '9 bulan', '12 bulan', '18 bulan', '24 bulan']);
-            $table->enum('revenue', ['Rp 300 Juta - 499 Juta per bulan', 'Rp 500 Juta - 1 Miliar per bulan', 'Rp 2 - 5 Miliar per bulan ', '> 5 Miliar per bulan']);
             $table->string('status')->default('pending');
             $table->timestamps();
         });

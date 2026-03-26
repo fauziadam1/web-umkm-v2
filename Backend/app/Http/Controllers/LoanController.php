@@ -28,6 +28,7 @@ class LoanController extends Controller
         ]);
 
         $loan = Loan::create([
+            'user_id' => $request->user()->id,
             'firstname' => $request->firstname,
             'lastname' => $request->lastname,
             'email' => $request->email,

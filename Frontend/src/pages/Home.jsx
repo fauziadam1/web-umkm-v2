@@ -9,6 +9,12 @@ import { useAuth } from "@/lib/auth";
 export default function HomePage() {
   const { user } = useAuth();
 
+  const roles = {
+    admin: "/dashboard/admin",
+    manager: "/dashboard/manager",
+    user: "/dashboard",
+  };
+
   return (
     <div className="w-full h-screen bg-white">
       <Layout />
@@ -28,17 +34,16 @@ export default function HomePage() {
               Dapatkan pinjaman hingga Rp 5 Miliar untuk mengembangkan usaha
               Anda.
             </p>
-            {user?.role === "admin" || user?.role === "manager" ? (
-              <Link to={"/"}>
-                <Button>Dashboard</Button>
+            <span className="flex items-center gap-4">
+              <Link to={roles[user?.role] || "/dashboard"}>
+                <Button variant="outline">Dashboard</Button>
               </Link>
-            ) : (
               <Link to={"/loan"}>
                 <Button>
                   Ajukan Sekarang <ArrowRight />
                 </Button>
               </Link>
-            )}
+            </span>
           </span>
           <div className="grid grid-cols-3 md:gap-13">
             {items.map((i) => (

@@ -7,12 +7,30 @@ import LoanForm from "./pages/LoanForm";
 import { ProtectPage } from "./components/ProtectPage";
 import Profile from "./pages/Profile";
 import AuthProvider from "./lib/auth";
+import DashboardUser from "./pages/DashboardUser";
+import DashboardAdmin from "./pages/DashboardAdmin";
 
 function App() {
   return (
     <AuthProvider>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectPage>
+              <DashboardUser />
+            </ProtectPage>
+          }
+        />
+        <Route
+          path="/dashboard/admin"
+          element={
+            <ProtectPage>
+              <DashboardAdmin />
+            </ProtectPage>
+          }
+        />
         <Route
           path="/profile"
           element={

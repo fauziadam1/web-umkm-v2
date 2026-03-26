@@ -25,17 +25,13 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
 import { FileUploud } from "@/lib/file";
+import { useNavigate } from "react-router";
 
 export default function LoanForm() {
+  const navigate = useNavigate();
+  const { reset } = useForm();
   const [loading, setLoading] = useState(false);
   const today = new Date().toISOString().split("T")[0];
-
-  const revenues = [
-    "Rp 300 Juta - 499 Juta per bulan",
-    "Rp 500 Juta - 1 Miliar per bulan",
-    "Rp 2 - 5 Miliar per bulan ",
-    "> 5 Miliar per bulan",
-  ];
 
   const tenor = [
     "3 bulan",
@@ -59,12 +55,10 @@ export default function LoanForm() {
     address: z.string().trim().min(1, "Kolom alamat perusahaan wajib diisi"),
     purpose: z.string().trim().min(1, "Kolom tujuan wajib diisi"),
     amount: z
-      .string()
-      .trim()
+      .number()
       .min(1, "Kolom jumlah peminjaman wajib diisi")
-      .max(11, "Maksimal pengajuan Rp 500.000.000"),
+      .max(500_000_000, "Maksimal pengajuan Rp 500.000.000"),
     tenor: z.string().trim().min(1, "Kolom tenor wajib diisi"),
-    revenue: z.string().trim().min(1, "Kolom omset wajib diisi"),
     ktp: z
       .array(z.instanceof(File))
       .min(1, "Harus mengupload minimal 1 file KTP"),
@@ -101,18 +95,22 @@ export default function LoanForm() {
     try {
       const formData = new FormData();
 
-      Object.keys(data).forEach((key) => {
+      for (const key in data) {
         const value = data[key];
+
         if (Array.isArray(value)) {
-          value.forEach((file) => formData.append(key, file));
+          value.forEach((file) => {
+            formData.append(key, file);
+          });
         } else {
           formData.append(key, value);
         }
-      });
+      }
 
       await api.post("/api/loan", formData);
-
       setLoading(false);
+      navigate("/");
+      reset();
       toast.info("Pengajuan berhasil di kirim. Tunggu informasi selanjutnya");
     } catch (errors) {
       toast.error(errors.response.data.message);
@@ -121,8 +119,8 @@ export default function LoanForm() {
   };
 
   function formatRupiah(value) {
-    const number = value.replace(/\D/g, "");
-    return new Intl.NumberFormat("id-ID").format(Number(number));
+    if (!value) return "";
+    return new Intl.NumberFormat("id-ID").format(value);
   }
 
   return (
@@ -261,50 +259,28 @@ export default function LoanForm() {
                 </Field>
               )}
             />
-            <div className="grid grid-cols-2 gap-4">
-              <Controller
-                name="revenue"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field>
-                    <FieldLabel>Omset Perusahaan</FieldLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {revenues.map((r) => (
-                          <SelectItem key={r} value={r}>
-                            {r}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
-              <Controller
-                name="amount"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field>
-                    <FieldLabel>Jumlah Peminjaman</FieldLabel>
-                    <Input
-                      {...field}
-                      value={formatRupiah(field.value)}
-                      placeholder="500.000.000"
-                      autoComplete="off"
-                    />
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
-            </div>
+            <Controller
+              name="amount"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field>
+                  <FieldLabel>Jumlah Peminjaman</FieldLabel>
+                  <Input
+                    {...field}
+                    value={formatRupiah(field.value)}
+                    onChange={(e) => {
+                      const raw = e.target.value.replace(/\D/g, "");
+                      field.onChange(raw ? parseInt(raw) : 0);
+                    }}
+                    placeholder="500.000.000"
+                    autoComplete="off"
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
             <div className="grid grid-cols-2 gap-4">
               <Controller
                 name="tenor"

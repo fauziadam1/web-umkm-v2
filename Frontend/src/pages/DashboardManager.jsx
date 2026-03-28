@@ -5,6 +5,7 @@ import { CircleCheck, Clock, Eye, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Layout } from "@/components/Layout";
 import { Spinner } from "@/components/ui/spinner";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -13,9 +14,10 @@ import {
   SelectValue,
   SelectItem,
 } from "@/components/ui/select";
-import DialogDetailLoanAdmin from "./DialogDetailLoanAdmin";
+import DialogDetailLoan from "./DialogDetailLoanAdmin";
+import DialogDetailLoanManager from "./DialogDetailLoanManager";
 
-export default function DashboardAdmin() {
+export default function DashboardManager() {
   const [loan, setLoan] = useState([]);
   const [loading, setLoading] = useState(false);
   const [filterStatus, setFilterStatus] = useState("all");
@@ -60,12 +62,12 @@ export default function DashboardAdmin() {
       <div className="py-20 px-5 space-y-8">
         <div className="space-y-5">
           <span className="flex flex-col">
-            <h1 className="font-semibold text-2xl">Dashboard Admin</h1>
+            <h1 className="font-semibold text-2xl">Dashboard Manager</h1>
             <p className="text-muted-foreground text-sm">
               Kelola pengajuan peminjaman dana UMKM
             </p>
           </span>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Card>
               <CardContent className="flex items-center gap-5">
                 <span className="w-12 h-12 bg-amber-100 text-amber-600 flex items-center justify-center rounded-xl">
@@ -83,13 +85,28 @@ export default function DashboardAdmin() {
             </Card>
             <Card>
               <CardContent className="flex items-center gap-5">
-                <span className="w-12 h-12 bg-green-100 text-green-600 flex items-center justify-center rounded-xl">
+                <span className="w-12 h-12 bg-secondary text-primary flex items-center justify-center rounded-xl">
                   <CircleCheck />
                 </span>
                 <div>
                   <p className="text-muted-foreground text-xs">Disetujui</p>
                   <h1 className="text-xl font-semibold">
                     {loan.filter((l) => l.status === "approved").length}
+                  </h1>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="flex items-center gap-5">
+                <span className="w-12 h-12 bg-green-100 text-green-600 flex items-center justify-center rounded-xl">
+                  <CircleCheck />
+                </span>
+                <div>
+                  <p className="text-muted-foreground text-xs">
+                    Peminjaman Berhasil
+                  </p>
+                  <h1 className="text-xl font-semibold">
+                    {loan.filter((l) => l.status === "superapproved").length}
                   </h1>
                 </div>
               </CardContent>
@@ -124,6 +141,9 @@ export default function DashboardAdmin() {
                   <SelectItem value="all">All</SelectItem>
                   <SelectItem value="pending">Menunggu</SelectItem>
                   <SelectItem value="approved">Disetujui</SelectItem>
+                  <SelectItem value="superapproved">
+                    Peminjaman Berhasil
+                  </SelectItem>
                   <SelectItem value="reject">Ditolak</SelectItem>
                 </SelectGroup>
               </SelectContent>
@@ -142,7 +162,7 @@ export default function DashboardAdmin() {
                   <p>{l.tenor}</p>
                   <span className="flex items-center justify-between">
                     <p
-                      className={`px-3 py-1 inline-flex rounded-xl ${l.status === "pending" ? "bg-amber-100 border border-amber-200 text-amber-600" : l.status === "approved" ? "bg-green-100 border border-green-200 text-green-600" : ""}`}
+                      className={`px-3 py-1 inline-flex rounded-xl ${l.status === "pending" ? "bg-amber-100 border border-amber-200 text-amber-600" : l.status === "approved" ? "bg-blue-100 border border-blue-200 text-blue-600" : ""}`}
                     >
                       {l.status === "pending"
                         ? "Menunggu"
@@ -150,7 +170,7 @@ export default function DashboardAdmin() {
                           ? "Disetujui"
                           : "Ditolak"}
                     </p>
-                    <DialogDetailLoanAdmin loan={l} />
+                    <DialogDetailLoanManager loan={l} />
                   </span>
                 </CardContent>
               </Card>

@@ -9,6 +9,9 @@ import Profile from "./pages/Profile";
 import AuthProvider from "./lib/auth";
 import DashboardUser from "./pages/DashboardUser";
 import DashboardAdmin from "./pages/DashboardAdmin";
+import { AdminProtectPage } from "./components/AdminProtectPage";
+import DashboardManager from "./pages/DashboardManager";
+import { ManagerProtectPage } from "./components/ManagerProtectPage";
 
 function App() {
   return (
@@ -26,9 +29,17 @@ function App() {
         <Route
           path="/dashboard/admin"
           element={
-            <ProtectPage>
+            <AdminProtectPage>
               <DashboardAdmin />
-            </ProtectPage>
+            </AdminProtectPage>
+          }
+        />
+        <Route
+          path="/dashboard/manager"
+          element={
+            <ManagerProtectPage>
+              <DashboardManager />
+            </ManagerProtectPage>
           }
         />
         <Route

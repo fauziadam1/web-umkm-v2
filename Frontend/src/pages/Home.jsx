@@ -35,9 +35,11 @@ export default function HomePage() {
               Anda.
             </p>
             <span className="flex items-center gap-4">
-              <Link to={roles[user?.role] || "/dashboard"}>
-                <Button variant="outline">Dashboard</Button>
-              </Link>
+              {user && (
+                <Link to={roles[user?.role] || "/dashboard"}>
+                  <Button variant="outline">Dashboard</Button>
+                </Link>
+              )}
               <Link to={"/loan"}>
                 <Button>
                   Ajukan Sekarang <ArrowRight />

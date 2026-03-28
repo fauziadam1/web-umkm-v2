@@ -60,7 +60,7 @@ export default function DashboardUser() {
               Selamat datang, {user.name}
             </p>
           </span>
-          <div className="grid grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {loan.map((l) => (
               <Card key={l}>
                 <CardContent className="flex items-center gap-5">
@@ -88,7 +88,7 @@ export default function DashboardUser() {
                     Pinjaman Aktif
                   </p>
                   <h1 className="text-xl font-semibold">
-                    {loan.filter((l) => l.status === "aprroved").length}
+                    {loan.filter((l) => l.status === "superapproved").length}
                   </h1>
                 </div>
               </CardContent>
@@ -124,13 +124,13 @@ export default function DashboardUser() {
                         l.status === "pending"
                           ? "bg-amber-100 border border-amber-200 text-amber-600"
                           : l.status === "approved"
-                            ? "bg-primary"
+                            ? "bg-blue-100 border border-blue-200 text-blue-600"
                             : "bg-destructive"
                       }`}
                     >
                       {l.status === "pending"
                         ? "Menunggu"
-                        : l.status === "aprroved"
+                        : l.status === "approved"
                           ? "Disetujui"
                           : "Ditolak"}
                     </span>
@@ -142,7 +142,7 @@ export default function DashboardUser() {
                       <p className="text-muted-foreground text-xs">
                         Jumlah Pinjaman
                       </p>
-                      <h1 className="font-medium">Rp {l.amount}</h1>
+                      <h1 className="font-medium">Rp {formatRupiah(l.amount)}</h1>
                     </span>
                     <span>
                       <p className="text-muted-foreground text-xs">

@@ -21,15 +21,89 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
-import { FileUploud } from "@/lib/file";
 import { useNavigate } from "react-router";
+import { File as FileIcon, FileText } from "lucide-react";
+
+function FileUpload({ value = [], onChange }) {
+  const inputRef = useRef(null);
+
+  function handleAddFile(fileList) {
+    const newFile = [...value, ...Array.from(fileList)];
+    onChange(newFile);
+  }
+
+  function handleRemove(index) {
+    const newFile = value.filter((_, i) => i !== index);
+    onChange(newFile);
+  }
+
+  return (
+    <div>
+      <Button
+        type="button"
+        variant="outline"
+        onClick={() => inputRef.current.click()}
+      >
+        <FileIcon className="size-4" /> Choose File
+      </Button>
+
+      <input
+        ref={inputRef}
+        type="file"
+        multiple
+        accept="image/*,application/pdf"
+        className="hidden"
+        onChange={(e) => {
+          handleAddFile(e.target.files);
+          e.target.value = "";
+        }}
+      />
+
+      <div className="flex gap-3 mt-3 flex-wrap">
+        {value.map((file, index) => {
+          const isImage = file.type.startsWith("image/");
+
+          return (
+            <div
+              key={index}
+              className="relative border rounded-lg overflow-hidden flex items-center justify-center bg-gray-50"
+            >
+              {isImage ? (
+                <div className="flex items-center justify-center gap-2 text-sm p-2">
+                  <img
+                    src={URL.createObjectURL(file)}
+                    className="w-8 h-8 object-cover rounded"
+                  />
+                  <span className="truncate">{file.name}</span>
+                </div>
+              ) : (
+                <div className="flex items-center justify-center gap-2 text-sm p-2">
+                  <FileText className="size-5" />
+                  <span className="truncate">{file.name}</span>
+                </div>
+              )}
+
+              <Button
+                size="icon"
+                type="buton"
+                onClick={() => handleRemove(index)}
+                className="rounded-full size-7 mr-2"
+              >
+                ×
+              </Button>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 export default function LoanForm() {
   const navigate = useNavigate();
-  const { reset } = useForm();
   const [loading, setLoading] = useState(false);
   const today = new Date().toISOString().split("T")[0];
 
@@ -59,15 +133,10 @@ export default function LoanForm() {
       .min(1, "Kolom jumlah peminjaman wajib diisi")
       .max(500_000_000, "Maksimal pengajuan Rp 500.000.000"),
     tenor: z.string().trim().min(1, "Kolom tenor wajib diisi"),
-    ktp: z
-      .array(z.instanceof(File))
-      .min(1, "Harus mengupload minimal 1 file KTP"),
+    ktp: z.array(z.instanceof(File)).min(1, "Harus upload minimal 1 file KTP"),
     npwp: z
       .array(z.instanceof(File))
-      .min(1, "Harus mengupload minimal 1 file NPWP"),
-    business_photo: z
-      .array(z.instanceof(File))
-      .min(1, "Harus mengupload minimal 1 foto perusahaan"),
+      .min(1, "Harus upload minimal 1 file NPWP"),
   });
 
   const form = useForm({
@@ -86,7 +155,6 @@ export default function LoanForm() {
       revenue: "",
       ktp: [],
       npwp: [],
-      business_photo: [],
     },
   });
 
@@ -95,23 +163,29 @@ export default function LoanForm() {
     try {
       const formData = new FormData();
 
-      for (const key in data) {
-        const value = data[key];
+      formData.append("firstname", data.firstname);
+      formData.append("lastname", data.lastname);
+      formData.append("email", data.email);
+      formData.append("telp", data.telp);
+      formData.append("business_name", data.business_name);
+      formData.append("address", data.address);
+      formData.append("purpose", data.purpose);
+      formData.append("amount", data.amount);
+      formData.append("tenor", data.tenor);
 
-        if (Array.isArray(value)) {
-          value.forEach((file) => {
-            formData.append(key, file);
-          });
-        } else {
-          formData.append(key, value);
-        }
-      }
+      (data.ktp || []).forEach((file) => {
+        formData.append("ktp[]", file);
+      });
+
+      (data.npwp || []).forEach((file) => {
+        formData.append("npwp[]", file);
+      });
 
       await api.post("/api/loan", formData);
       setLoading(false);
-      navigate("/");
-      reset();
       toast.info("Pengajuan berhasil di kirim. Tunggu informasi selanjutnya");
+      navigate("/");
+      form();
     } catch (errors) {
       toast.error(errors.response.data.message);
       setLoading(false);
@@ -322,7 +396,7 @@ export default function LoanForm() {
               render={({ field, fieldState }) => (
                 <Field>
                   <FieldLabel>KTP</FieldLabel>
-                  <FileUploud
+                  <FileUpload
                     value={field.value}
                     onChange={field.onChange}
                     maxFiles={3}
@@ -339,24 +413,7 @@ export default function LoanForm() {
               render={({ field, fieldState }) => (
                 <Field>
                   <FieldLabel>NPWP</FieldLabel>
-                  <FileUploud
-                    value={field.value}
-                    onChange={field.onChange}
-                    maxFiles={3}
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-            <Controller
-              name="business_photo"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field>
-                  <FieldLabel>Foto Perusahaan</FieldLabel>
-                  <FileUploud
+                  <FileUpload
                     value={field.value}
                     onChange={field.onChange}
                     maxFiles={3}

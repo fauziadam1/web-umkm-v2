@@ -23,7 +23,8 @@ import {
   FileText,
 } from "lucide-react";
 
-export default function DialogDetailLoanManager({ loan, fetchLoan }) {
+export default function DialogDetailLoanManager({ loan, refreshData }) {
+  const [open, setOpen] = useState(false);
   const [document, setDocument] = useState([]);
   const [approvedLoading, setApprovedLoading] = useState(false);
   const [dialogLoading, setDialogLoading] = useState(false);
@@ -48,10 +49,11 @@ export default function DialogDetailLoanManager({ loan, fetchLoan }) {
   const handleApproved = async () => {
     setApprovedLoading(true);
     try {
-      await api.put(`/api/manager/loan/${loan.id}`, {
+      await api.put(`/api/success/loan/${loan.id}`, {
         status: "superapproved",
       });
-      fetchLoan();
+      setOpen();
+      refreshData();
       setApprovedLoading(false);
     } catch (errors) {
       toast.error(errors.data.response.message);
@@ -60,7 +62,13 @@ export default function DialogDetailLoanManager({ loan, fetchLoan }) {
   };
 
   return (
-    <Dialog onOpenChange={(open) => open && fethDocument()}>
+    <Dialog
+      open={open}
+      onOpenChange={(value) => {
+        if (value) fethDocument();
+        setOpen(value);
+      }}
+    >
       <DialogTrigger asChild>
         <Button variant="secondary">
           Lihat <Eye />

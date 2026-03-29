@@ -172,7 +172,7 @@ export default function DashboardManager() {
                             ? "Pinjaman Berhasil"
                             : "Ditolak"}
                     </p>
-                    <DialogDetailLoanManager loan={l} />
+                    <DialogDetailLoanManager loan={l} refreshData={fetchLoan} />
                   </span>
                 </CardContent>
               </Card>

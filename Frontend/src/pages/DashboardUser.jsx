@@ -52,7 +52,7 @@ export default function DashboardUser() {
   const total = loan.reduce((sum, item) => sum + Number(item.amount), 0);
 
   return (
-    <div className="w-full h-screen bg-white">
+    <div className="w-full min-h-screen bg-white">
       <Layout />
       <div className="py-20 px-5 space-y-10">
         <div className="space-y-4">
@@ -63,21 +63,21 @@ export default function DashboardUser() {
             </p>
           </span>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card>
-                <CardContent className="flex items-center gap-5">
-                  <span className="w-12 h-12 bg-secondary text-primary flex items-center justify-center rounded-xl">
-                    <Wallet />
-                  </span>
-                  <div>
-                    <p className="text-muted-foreground text-xs">
-                      Total Pinjaman
-                    </p>
-                    <h1 className="text-xl font-semibold">
-                      {formatRupiah(total)}
-                    </h1>
-                  </div>
-                </CardContent>
-              </Card>
+            <Card>
+              <CardContent className="flex items-center gap-5">
+                <span className="w-12 h-12 bg-secondary text-primary flex items-center justify-center rounded-xl">
+                  <Wallet />
+                </span>
+                <div>
+                  <p className="text-muted-foreground text-xs">
+                    Total Pinjaman
+                  </p>
+                  <h1 className="text-xl font-semibold">
+                    {formatRupiah(total)}
+                  </h1>
+                </div>
+              </CardContent>
+            </Card>
             <Card>
               <CardContent className="flex items-center gap-5">
                 <span className="w-12 h-12 bg-green-100 text-green-600 flex items-center justify-center rounded-xl">
@@ -103,7 +103,12 @@ export default function DashboardUser() {
                     Menunggu Persetujuan
                   </p>
                   <h1 className="text-xl font-semibold">
-                    {loan.filter((l) => l.status === "pending").length}
+                    {
+                      loan.filter(
+                        (l) =>
+                          l.status === "pending" || l.status === "approved",
+                      ).length
+                    }
                   </h1>
                 </div>
               </CardContent>
@@ -162,7 +167,9 @@ export default function DashboardUser() {
                     </span>
                     {l.installments?.[0] && (
                       <span>
-                        <p className="text-muted-foreground text-xs">Cicilan/bulan</p>
+                        <p className="text-muted-foreground text-xs">
+                          Cicilan/bulan
+                        </p>
                         <h1 className="font-medium">
                           Rp {formatRupiah(l.installments[0].amount)}
                         </h1>
@@ -172,6 +179,28 @@ export default function DashboardUser() {
                 </CardContent>
               </Card>
             ))}
+          </div>
+        </div>
+        <div className="flex flex-col gap-2">
+          <h1 className="font-medium">Cicilan</h1>
+          <div className="flex flex-col gap-4">
+            {loan
+              .filter((l) => l.status === "superapproved")
+              .map((l) => (
+                <Card key={l}>
+                  <CardContent className="flex items-center justify-between">
+                    <span>
+                      <h1 className="font-medium">{l.loan_code}</h1>
+                      <p className="text-muted-foreground text-xs">
+                        {l.purpose}
+                      </p>
+                    </span>
+                    <span>
+                      <h1 className="font-medium">Rp {formatRupiah(l.installments[0].amount)}</h1>
+                    </span>
+                  </CardContent>
+                </Card>
+              ))}
           </div>
         </div>
       </div>

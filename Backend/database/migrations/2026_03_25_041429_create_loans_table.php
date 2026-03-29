@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('loan_code')->unique();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->string('firstname', 255);
-            $table->string('lastname', 255);
+            $table->string('name', 255);
+            $table->string('norek');
             $table->string('telp', 20);
             $table->string('email');
             $table->date('request_date');
@@ -24,7 +24,7 @@ return new class extends Migration
             $table->text('address');
             $table->text('purpose');
             $table->integer('amount');
-            $table->enum('tenor', ['3 bulan', '6 bulan', '9 bulan', '12 bulan', '18 bulan', '24 bulan']);
+            $table->integer('tenor');
             $table->string('status')->default('pending');
             $table->timestamps();
         });

@@ -9,8 +9,8 @@ class Loan extends Model
     protected $fillable = [
         'loan_code',
         'user_id',
-        'firstname',
-        'lastname',
+        'name',
+        'norek',
         'telp',
         'email',
         'request_date',
@@ -21,4 +21,9 @@ class Loan extends Model
         'tenor',
         'status'
     ];
+
+    public function installments()
+    {
+        return $this->hasMany(Installment::class);
+    }
 }

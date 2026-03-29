@@ -189,14 +189,28 @@ export default function DashboardUser() {
               .map((l) => (
                 <Card key={l}>
                   <CardContent className="flex items-center justify-between">
-                    <span>
-                      <h1 className="font-medium">{l.loan_code}</h1>
-                      <p className="text-muted-foreground text-xs">
-                        {l.purpose}
-                      </p>
-                    </span>
-                    <span>
-                      <h1 className="font-medium">Rp {formatRupiah(l.installments[0].amount)}</h1>
+                    <div className="flex items-center gap-4">
+                      <span
+                        className={`p-2 text-xs rounded-2xl ${l.installments[0].status === "pending" ? "bg-amber-100 border border-amber-200 text-amber-600" : "bg-green-100 border border-green-200 text-green-600"}`}
+                      >
+                        {l.installments[0].status === "pending"
+                          ? "Belum dibayar"
+                          : "Lunas"}
+                      </span>
+                      <span>
+                        <h1 className="font-medium">
+                          {l.loan_code} - {l.business_name}
+                        </h1>
+                        <p className="text-muted-foreground text-xs">
+                          {l.purpose}
+                        </p>
+                      </span>
+                    </div>
+                    <span className="flex flex-col items-end">
+                      <h1 className="font-medium">
+                        Rp {formatRupiah(l.installments[0].amount)}
+                      </h1>
+                      <p className="text-xs text-muted-foreground">Bulan ke-</p>
                     </span>
                   </CardContent>
                 </Card>

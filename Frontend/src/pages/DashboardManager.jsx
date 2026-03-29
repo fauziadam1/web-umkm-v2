@@ -162,13 +162,15 @@ export default function DashboardManager() {
                   <p>{l.tenor}</p>
                   <span className="flex items-center justify-between">
                     <p
-                      className={`px-3 py-1 inline-flex rounded-xl ${l.status === "pending" ? "bg-amber-100 border border-amber-200 text-amber-600" : l.status === "approved" ? "bg-blue-100 border border-blue-200 text-blue-600" : ""}`}
+                      className={`px-3 py-1 inline-flex rounded-xl ${l.status === "pending" ? "bg-amber-100 border border-amber-200 text-amber-600" : l.status === "approved" ? "bg-blue-100 border border-blue-200 text-blue-600" : l.status === "superapproved" ? "bg-green-100 border border-green-200 text-green-600" : "bg-red-100 border border-red-200 text-destructive"}`}
                     >
                       {l.status === "pending"
                         ? "Menunggu"
                         : l.status === "approved"
                           ? "Disetujui"
-                          : "Ditolak"}
+                          : l.status === "superapproved"
+                            ? "Pinjaman Berhasil"
+                            : "Ditolak"}
                     </p>
                     <DialogDetailLoanManager loan={l} />
                   </span>

@@ -4,7 +4,7 @@ import { Navigate } from "react-router";
 export function ManagerProtectPage({ children }) {
   const { user } = useAuth();
 
-  if (user.role !== "manager") {
+  if (!user || user.role !== "manager") {
     return <Navigate to={"/"} />;
   }
 

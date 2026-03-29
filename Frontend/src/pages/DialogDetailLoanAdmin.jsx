@@ -23,7 +23,8 @@ import {
   FileText,
 } from "lucide-react";
 
-export default function DialogDetailLoanAdmin({ loan }) {
+export default function DialogDetailLoanAdmin({ loan, refreshData }) {
+  const [open, setOpen] = useState(false);
   const [document, setDocument] = useState([]);
   const [approvedLoading, setApprovedLoading] = useState(false);
   const [dialogLoading, setDialogLoading] = useState(false);
@@ -48,9 +49,11 @@ export default function DialogDetailLoanAdmin({ loan }) {
   const handleApproved = async () => {
     setApprovedLoading(true);
     try {
-      await api.put(`/api/admin/loan/${loan.id}`, {
+      await api.put(`/api/approved/loan/${loan.id}`, {
         status: "approved",
       });
+      setOpen(false);
+      refreshData();
       setApprovedLoading(false);
     } catch (errors) {
       toast.error(errors.data.response.message);
@@ -59,7 +62,13 @@ export default function DialogDetailLoanAdmin({ loan }) {
   };
 
   return (
-    <Dialog onOpenChange={(open) => open && fethDocument()}>
+    <Dialog
+      open={open}
+      onOpenChange={(value) => {
+        if (value) fethDocument();
+        setOpen(value);
+      }}
+    >
       <DialogTrigger asChild>
         <Button variant="secondary">
           Lihat <Eye />
@@ -72,16 +81,16 @@ export default function DialogDetailLoanAdmin({ loan }) {
         </DialogHeader>
         <div className="grid grid-cols-3 space-y-4">
           <span>
-            <h1 className="font-medium">Nama Depan</h1>
-            <p className="text-sm text-muted-foreground">{loan.firstname}</p>
-          </span>
-          <span>
-            <h1 className="font-medium">Nama Belakang</h1>
-            <p className="text-sm text-muted-foreground">{loan.lastname}</p>
+            <h1 className="font-medium">Nama</h1>
+            <p className="text-sm text-muted-foreground">{loan.name}</p>
           </span>
           <span>
             <h1 className="font-medium">No Telepon</h1>
             <p className="text-sm text-muted-foreground">{loan.telp}</p>
+          </span>
+          <span>
+            <h1 className="font-medium">No Rekening</h1>
+            <p className="text-sm text-muted-foreground">{loan.norek}</p>
           </span>
           <span>
             <h1 className="font-medium">Alamat Email</h1>

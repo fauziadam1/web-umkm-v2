@@ -23,7 +23,7 @@ import {
   FileText,
 } from "lucide-react";
 
-export default function DialogDetailLoanManager({ loan }) {
+export default function DialogDetailLoanManager({ loan, fetchLoan }) {
   const [document, setDocument] = useState([]);
   const [approvedLoading, setApprovedLoading] = useState(false);
   const [dialogLoading, setDialogLoading] = useState(false);
@@ -51,6 +51,7 @@ export default function DialogDetailLoanManager({ loan }) {
       await api.put(`/api/manager/loan/${loan.id}`, {
         status: "superapproved",
       });
+      fetchLoan();
       setApprovedLoading(false);
     } catch (errors) {
       toast.error(errors.data.response.message);
@@ -152,7 +153,6 @@ export default function DialogDetailLoanManager({ loan }) {
                       onClick={() => {
                         window.open(
                           `http://localhost:8000/api/document/download/${d.id}`,
-                          "_blank",
                         );
                       }}
                     >
@@ -172,9 +172,6 @@ export default function DialogDetailLoanManager({ loan }) {
         </span>
         {loan.status === "approved" ? (
           <DialogFooter>
-            <Button variant="destructive">
-              Tolak <CircleX />
-            </Button>
             <Button onClick={() => handleApproved()} disabled={approvedLoading}>
               Setujui {approvedLoading ? <Spinner /> : <CircleCheck />}
             </Button>
@@ -183,9 +180,15 @@ export default function DialogDetailLoanManager({ loan }) {
           <DialogFooter>
             <Button disabled>Menunggu Persetujuan Admin</Button>
           </DialogFooter>
+        ) : loan.status === "superapproved" ? (
+          <DialogFooter>
+            <Button disabled>Pinjaman Berhasil</Button>
+          </DialogFooter>
         ) : (
           <DialogFooter>
-            <Button variant="destructive" disabled>Pinjaman Ditolak</Button>
+            <Button variant="destructive" disabled>
+              Pinjaman Ditolak
+            </Button>
           </DialogFooter>
         )}
       </DialogContent>

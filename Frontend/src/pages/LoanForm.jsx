@@ -107,18 +107,11 @@ export default function LoanForm() {
   const [loading, setLoading] = useState(false);
   const today = new Date().toISOString().split("T")[0];
 
-  const tenor = [
-    "3 bulan",
-    "6 bulan",
-    "9 bulan",
-    "12 bulan",
-    "18 bulan",
-    "24 bulan",
-  ];
+  const tenor = [3, 6, 9, 12, 18, 24];
 
   const formSchema = z.object({
-    firstname: z.string().trim().min(1, "Kolom nama depan wajib diisi"),
-    lastname: z.string().trim().min(1, "Kolom nama belakang wajib diisi"),
+    name: z.string().trim().min(1, "Kolom nama wajib diisi"),
+    norek: z.string().trim().min(1, "Kolom nomor rekening wajib diisi"),
     telp: z.string().trim().min(1, "Kolom nomor telepon wajib diisi"),
     email: z.string().email().min(1, "Kolom email wajib diisi"),
     request_date: z.string(),
@@ -132,7 +125,7 @@ export default function LoanForm() {
       .number()
       .min(1, "Kolom jumlah peminjaman wajib diisi")
       .max(500_000_000, "Maksimal pengajuan Rp 500.000.000"),
-    tenor: z.string().trim().min(1, "Kolom tenor wajib diisi"),
+    tenor: z.number().min(1, "Kolom tenor wajib diisi"),
     ktp: z.array(z.instanceof(File)).min(1, "Harus upload minimal 1 file KTP"),
     npwp: z
       .array(z.instanceof(File))
@@ -142,8 +135,7 @@ export default function LoanForm() {
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      firstname: "",
-      lastname: "",
+      name: "",
       telp: "",
       email: "",
       request_date: today,
@@ -151,6 +143,7 @@ export default function LoanForm() {
       address: "",
       purpose: "",
       amount: "",
+      norek: "",
       tenor: "",
       revenue: "",
       ktp: [],
@@ -163,8 +156,8 @@ export default function LoanForm() {
     try {
       const formData = new FormData();
 
-      formData.append("firstname", data.firstname);
-      formData.append("lastname", data.lastname);
+      formData.append("name", data.name);
+      formData.append("norek", data.norek);
       formData.append("email", data.email);
       formData.append("telp", data.telp);
       formData.append("business_name", data.business_name);
@@ -210,48 +203,25 @@ export default function LoanForm() {
         </FieldSet>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup>
-            <div className="grid grid-cols-2 gap-4">
-              <Controller
-                name="firstname"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field>
-                    <FieldLabel>Name Depan</FieldLabel>
-                    <Input
-                      {...field}
-                      placeholder="Nama Depan"
-                      autoComplete="off"
-                    />
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
-              <Controller
-                name="lastname"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field>
-                    <FieldLabel>Name Belakang</FieldLabel>
-                    <Input
-                      {...field}
-                      placeholder="Nama Belakang"
-                      autoComplete="off"
-                    />
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
-            </div>
+            <Controller
+              name="name"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field>
+                  <FieldLabel>Nama</FieldLabel>
+                  <Input {...field} placeholder="Nama" autoComplete="off" />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
             <Controller
               name="business_name"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field>
-                  <FieldLabel>Nama PT/CV</FieldLabel>
+                  <FieldLabel>Nama Usaha, PT/CV</FieldLabel>
                   <Input
                     {...field}
                     placeholder="Nama PT/CV "
@@ -333,28 +303,47 @@ export default function LoanForm() {
                 </Field>
               )}
             />
-            <Controller
-              name="amount"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field>
-                  <FieldLabel>Jumlah Peminjaman</FieldLabel>
-                  <Input
-                    {...field}
-                    value={formatRupiah(field.value)}
-                    onChange={(e) => {
-                      const raw = e.target.value.replace(/\D/g, "");
-                      field.onChange(raw ? parseInt(raw) : 0);
-                    }}
-                    placeholder="500.000.000"
-                    autoComplete="off"
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
+            <div className="grid grid-cols-2 gap-4">
+              <Controller
+                name="amount"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field>
+                    <FieldLabel>Jumlah Peminjaman</FieldLabel>
+                    <Input
+                      {...field}
+                      value={formatRupiah(field.value)}
+                      onChange={(e) => {
+                        const raw = e.target.value.replace(/\D/g, "");
+                        field.onChange(raw ? parseInt(raw) : 0);
+                      }}
+                      placeholder="500.000.000"
+                      autoComplete="off"
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+              <Controller
+                name="norek"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field>
+                    <FieldLabel>Nomor Rekening</FieldLabel>
+                    <Input
+                      {...field}
+                      placeholder="Nomor Rekening"
+                      autoComplete="off"
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+            </div>
             <div className="grid grid-cols-2 gap-4">
               <Controller
                 name="tenor"
@@ -362,18 +351,22 @@ export default function LoanForm() {
                 render={({ field, fieldState }) => (
                   <Field>
                     <FieldLabel>Tenor</FieldLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+                    <Select
+                      onValueChange={(value) => field.onChange(Number(value))}
+                      value={field.value?.toString()}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Select" />
                       </SelectTrigger>
                       <SelectContent>
                         {tenor.map((t) => (
-                          <SelectItem key={t} value={t}>
-                            {t}
+                          <SelectItem key={t} value={t.toString()}>
+                            {t} bulan
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
+
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
                     )}

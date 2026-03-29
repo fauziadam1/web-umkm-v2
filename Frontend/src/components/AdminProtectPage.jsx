@@ -4,7 +4,7 @@ import { Navigate } from "react-router";
 export function AdminProtectPage({ children }) {
   const { user } = useAuth();
 
-  if (user.role !== "admin") {
+  if (!user || user.role !== "admin") {
     return <Navigate to={"/"} />;
   }
 
